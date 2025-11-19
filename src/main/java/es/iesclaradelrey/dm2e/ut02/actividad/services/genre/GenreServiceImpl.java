@@ -9,9 +9,9 @@ import lombok.Setter;
 import java.util.List;
 import java.util.Optional;
 
+@AllArgsConstructor
 @Getter
 @Setter
-@AllArgsConstructor
 public class GenreServiceImpl implements GenreService {
 
     // Atributo GenreDataAccess
