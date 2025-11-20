@@ -2,6 +2,7 @@ package es.iesclaradelrey.dm2e.ut02.actividad.actividad;
 
 import es.iesclaradelrey.dm2e.ut02.actividad.dataaccess.genre.GenreDataAccessImpl;
 import es.iesclaradelrey.dm2e.ut02.actividad.dataaccess.playlist.PlayListDataAccessImpl;
+import es.iesclaradelrey.dm2e.ut02.actividad.dataaccess.playlisttrack.PlayListTrackDataAccessImpl;
 import es.iesclaradelrey.dm2e.ut02.actividad.entities.Genre;
 import es.iesclaradelrey.dm2e.ut02.actividad.entities.PlayList;
 import es.iesclaradelrey.dm2e.ut02.actividad.entities.PlayListTrack;
@@ -9,6 +10,8 @@ import es.iesclaradelrey.dm2e.ut02.actividad.services.genre.GenreService;
 import es.iesclaradelrey.dm2e.ut02.actividad.services.genre.GenreServiceImpl;
 import es.iesclaradelrey.dm2e.ut02.actividad.services.playlist.PlayListService;
 import es.iesclaradelrey.dm2e.ut02.actividad.services.playlist.PlayListServiceImpl;
+import es.iesclaradelrey.dm2e.ut02.actividad.services.playlisttrack.PlayListTrackService;
+import es.iesclaradelrey.dm2e.ut02.actividad.services.playlisttrack.PlayListTrackServiceImpl;
 
 import java.util.*;
 
@@ -17,6 +20,7 @@ public class Main {
     // Declaración de servicios
     private final static GenreService GENRE_SERVICE = new GenreServiceImpl(new GenreDataAccessImpl());
     private final static PlayListService PLAYLIST_SERVICE = new PlayListServiceImpl(new PlayListDataAccessImpl());
+    private final static PlayListTrackService PLAYLISTTRACK_SERVICE = new PlayListTrackServiceImpl(new PlayListTrackDataAccessImpl());
 
     // Scanner
     private final static Scanner SCANNER = new Scanner(System.in);
@@ -171,9 +175,40 @@ public class Main {
     }
 
     private static void buscarListaDeReproduccionPorID() {
+        // Recogemos el ID de la lista de reproducción
+        System.out.println("Introduce el id de la lista de reproduccion a mostrar:");
+        int id = Integer.parseInt(SCANNER.nextLine().trim());
+
+        // Recogemos la lista generada
+        List<PlayListTrack> playListTracks = PLAYLISTTRACK_SERVICE.findAllByPlayListId(id);
+
+        if (playListTracks.isEmpty()) {
+            System.out.printf("No existe una lista de reproducción con id <%d>\n", id);
+        } else {
+            // Imprimimos la cabecera
+            System.out.printf("Lista de reproducción: %s\n", playListTracks.getFirst().getPlaylistName());
+            // Imprimimos cada pista de la lista
+            playListTracks.forEach(track -> {
+                System.out.printf("%d - %s -> %d - %s\n", track.getPlaylistId(), track.getPlaylistName(), track.getTrackId(), track.getTrackName());
+            });
+        }
     }
 
     private static void eliminarListaDeReproduccionPorID() {
+        // Recogemos el ID de la lista de reproducción
+        System.out.println("Introduce el id de la lista de reproduccion a eliminar:");
+        int id = Integer.parseInt(SCANNER.nextLine().trim());
+
+        // Instanciamos un 'optional' para ver si existe
+        Optional<PlayList> lista = PLAYLIST_SERVICE.findById(id);
+
+        // Si devuelve diferente de 'isEmpty' la eliminamos
+        if (lista.isPresent()) {
+            PLAYLIST_SERVICE.delete(id);
+            System.out.printf("Se ha eliminado la lista con id <%d>\n", id);
+        } else {
+            System.out.printf("No existe la lista de reproducción con id <%d>\n>", id);
+        }
     }
 
     private static void ejecutarOpcionSeleccionada(int opcion) {

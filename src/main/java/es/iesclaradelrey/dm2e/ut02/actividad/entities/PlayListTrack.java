@@ -10,6 +10,7 @@ import lombok.ToString;
 @Setter
 @ToString
 public class PlayListTrack {
+    private String playlistName;
     private int playlistId;
     private int trackId;
     private String trackName;

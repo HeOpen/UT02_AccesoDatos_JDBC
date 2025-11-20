@@ -26,7 +26,7 @@ public class PlayListDataAccessImpl implements PlayListDataAccess {
             // Intentamos encontrar resultados
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
-                    return Optional.of(new PlayList(resultSet.getInt("playlist_id"), resultSet.getString("name")));
+                    return Optional.of(PlayList.builder().playlistId(resultSet.getInt("playlist_id")).playlistName(resultSet.getString("name")).build());
                 }
             }
 
@@ -111,8 +111,8 @@ public class PlayListDataAccessImpl implements PlayListDataAccess {
             preparedStatementTracks.setInt(1, id);
 
             // Ejecutamos la sentencia y aprovechamos a devolver el bool (si hay columnas modificadas o no)
-            int registrosModficiadosPlaylist =  preparedStatementPlaylist.executeUpdate();
-            int  registrosModficiadosTrack =  preparedStatementTracks.executeUpdate();
+            int registrosModficiadosPlaylist = preparedStatementPlaylist.executeUpdate();
+            int registrosModficiadosTrack = preparedStatementTracks.executeUpdate();
             return registrosModficiadosPlaylist + registrosModficiadosTrack > 0;
 
         } catch (SQLException e) {
