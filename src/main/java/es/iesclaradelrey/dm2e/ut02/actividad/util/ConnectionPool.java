@@ -10,7 +10,7 @@ public enum ConnectionPool {
     INSTANCE;
 
     // Info BBDD
-    private final String URL = "jdbc:mysql://localhost:5432/chinook";
+    private final String URL = "jdbc:postgresql://localhost:5432/chinook";
     private final String USER = "chinook";
     private final String PASSWORD = "chinook";
 
