@@ -3,15 +3,14 @@ package es.iesclaradelrey.dm2e.ut02.actividad.actividad;
 import es.iesclaradelrey.dm2e.ut02.actividad.dataaccess.genre.GenreDataAccessImpl;
 import es.iesclaradelrey.dm2e.ut02.actividad.dataaccess.playlist.PlayListDataAccessImpl;
 import es.iesclaradelrey.dm2e.ut02.actividad.entities.Genre;
+import es.iesclaradelrey.dm2e.ut02.actividad.entities.PlayList;
+import es.iesclaradelrey.dm2e.ut02.actividad.entities.PlayListTrack;
 import es.iesclaradelrey.dm2e.ut02.actividad.services.genre.GenreService;
 import es.iesclaradelrey.dm2e.ut02.actividad.services.genre.GenreServiceImpl;
 import es.iesclaradelrey.dm2e.ut02.actividad.services.playlist.PlayListService;
 import es.iesclaradelrey.dm2e.ut02.actividad.services.playlist.PlayListServiceImpl;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.Scanner;
+import java.util.*;
 
 public class Main {
 
@@ -68,11 +67,11 @@ public class Main {
 
 
     // ----- Métodos para las opciones de menu (con la tabla GENEROS) ----- //
-    private static void buscarTodosGeneros(){
+    private static void buscarTodosGeneros() {
         GENRE_SERVICE.findAll().forEach(genre -> System.out.printf("%d - %s\n", genre.getGenreId(), genre.getName()));
     }
 
-    private static void buscarGeneroPorID(){
+    private static void buscarGeneroPorID() {
         System.out.println("Introduce el ID del género a buscar:");
         // fixme: ¿¿¿Y si no introduce un número???
         int id = SCANNER.nextInt();
@@ -86,7 +85,7 @@ public class Main {
         }
     }
 
-    private static void buscarGeneroPorNombre(){
+    private static void buscarGeneroPorNombre() {
         System.out.println("Introduce el nombre del género a buscar:");
         String nombre = SCANNER.nextLine().trim();
         List<Genre> posiblesGeneros = GENRE_SERVICE.findByName(nombre);
@@ -98,13 +97,13 @@ public class Main {
         }
     }
 
-    private static void crearNuevoGenero(){
+    private static void crearNuevoGenero() {
         System.out.println("Introduce el nombre del nuevo género a guardar");
         String nombre = SCANNER.nextLine().trim();
         GENRE_SERVICE.save(new Genre(nombre));
     }
 
-    private static void modificarGeneroExistente(){
+    private static void modificarGeneroExistente() {
         System.out.println("Introduce el ID del género a modificar:");
         int id = Integer.parseInt(SCANNER.nextLine().trim());
 
@@ -128,7 +127,8 @@ public class Main {
         }
 
     }
-    private static void eliminarGeneroPorID(){
+
+    private static void eliminarGeneroPorID() {
         System.out.println("Introduce el ID del género a eliminar:");
         int id = Integer.parseInt(SCANNER.nextLine().trim());
 
@@ -147,20 +147,36 @@ public class Main {
     }
 
     // ----- Métodos para las opciones de menu (con la tabla PLAYLIST) ----- //
-    private static void crearListaDeReproduccion(){
+    private static void crearListaDeReproduccion() {
+        // Recogemos el nombre de la nueva lista
         System.out.println("Introduce el nombre de la nueva lista de reproduccion:");
         String nombre = SCANNER.nextLine().trim();
+
+        // Recogemos los ids de los tracks
         System.out.println("Introduce los id de los tracks (separados por coma, estilo csv):");
-        List<Integer> listadoTracks = Arrays.stream(SCANNER.nextLine().split(","))
+        List<Integer> listadoInts = Arrays.stream(SCANNER.nextLine().split(","))
                 .map(String::trim)
                 .map(Integer::parseInt)
                 .toList();
 
-    }
-    private static void buscarListaDeReproduccionPorID(){}
-    private static void eliminarListaDeReproduccionPorID(){}
+        // Generamos los PlayListTrack
+        List<PlayListTrack> listadoTracks = new ArrayList<>();
 
-    private static void ejecutarOpcionSeleccionada(int opcion){
+        listadoInts.forEach(i -> {
+            listadoTracks.add(PlayListTrack.builder().trackId(i).build());
+        });
+
+        // Llamamos al servicio
+        PLAYLIST_SERVICE.save(PlayList.builder().playlistName(nombre).tracks(listadoTracks).build());
+    }
+
+    private static void buscarListaDeReproduccionPorID() {
+    }
+
+    private static void eliminarListaDeReproduccionPorID() {
+    }
+
+    private static void ejecutarOpcionSeleccionada(int opcion) {
         switch (opcion) {
             case 0 -> System.exit(0);
             case 1 -> buscarTodosGeneros();
