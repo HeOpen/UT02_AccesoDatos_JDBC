@@ -1,6 +1,5 @@
 package es.iesclaradelrey.dm2e.ut02.actividad.actividad;
 
-import es.iesclaradelrey.dm2e.ut02.actividad.dataaccess.genre.GenreDataAccess;
 import es.iesclaradelrey.dm2e.ut02.actividad.dataaccess.genre.GenreDataAccessImpl;
 import es.iesclaradelrey.dm2e.ut02.actividad.dataaccess.playlist.PlayListDataAccessImpl;
 import es.iesclaradelrey.dm2e.ut02.actividad.entities.Genre;
@@ -105,11 +104,59 @@ public class Main {
         GENRE_SERVICE.save(new Genre(nombre));
     }
 
-    private static void modificarGeneroExistente(){}
-    private static void eliminarGeneroPorID(){}
+    private static void modificarGeneroExistente(){
+        System.out.println("Introduce el ID del género a modificar:");
+        int id = Integer.parseInt(SCANNER.nextLine().trim());
+
+        // Instanciamos un 'optional' para ver qué nos devuelve
+        Optional<Genre> genre = GENRE_SERVICE.findById(id);
+
+        if (genre.isPresent()) {
+            // Guardamos el anterior nombre
+            String nombreAntiguo = genre.get().getName();
+
+            // Guardamos el nuevo nombre
+            System.out.println("¿Que nombre debería tener este género?:");
+            String nombreNuevo = SCANNER.nextLine().trim();
+
+            // Ejecutamos la sentencia
+            GENRE_SERVICE.update(new Genre(id, nombreNuevo));
+            System.out.printf("Se ha modificado el género <%s>. Su nuevo nombre es <%s>\n", nombreAntiguo, nombreNuevo);
+
+        } else {
+            System.out.printf("No existe el género con id <%d>\n", id);
+        }
+
+    }
+    private static void eliminarGeneroPorID(){
+        System.out.println("Introduce el ID del género a eliminar:");
+        int id = Integer.parseInt(SCANNER.nextLine().trim());
+
+        // Instanciamos un 'optional' para ver qué nos devuelve
+        Optional<Genre> genre = GENRE_SERVICE.findById(id);
+
+        if (genre.isPresent()) {
+            // Ejecutamos la sentencia
+            GENRE_SERVICE.delete(id);
+            System.out.printf("Se ha eliminado el género con id <%s>\n", genre.get().getGenreId());
+
+        } else {
+            System.out.printf("No existe el género con id <%d>\n", id);
+        }
+
+    }
 
     // ----- Métodos para las opciones de menu (con la tabla PLAYLIST) ----- //
-    private static void crearListaDeReproduccion(){}
+    private static void crearListaDeReproduccion(){
+        System.out.println("Introduce el nombre de la nueva lista de reproduccion:");
+        String nombre = SCANNER.nextLine().trim();
+        System.out.println("Introduce los id de los tracks (separados por coma, estilo csv):");
+        List<Integer> listadoTracks = Arrays.stream(SCANNER.nextLine().split(","))
+                .map(String::trim)
+                .map(Integer::parseInt)
+                .toList();
+
+    }
     private static void buscarListaDeReproduccionPorID(){}
     private static void eliminarListaDeReproduccionPorID(){}
 

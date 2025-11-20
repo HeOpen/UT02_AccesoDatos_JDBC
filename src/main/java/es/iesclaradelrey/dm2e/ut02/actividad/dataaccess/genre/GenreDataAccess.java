@@ -11,5 +11,6 @@ public interface GenreDataAccess {
     Optional<Genre> findById(int id);
     boolean existsById(int id);
     Genre save(Genre genre);
+    Genre update(Genre genre);
     boolean delete(int id);
 }

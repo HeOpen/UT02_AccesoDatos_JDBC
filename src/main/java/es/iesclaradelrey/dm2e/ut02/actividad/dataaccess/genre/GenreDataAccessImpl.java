@@ -15,6 +15,7 @@ public class GenreDataAccessImpl implements GenreDataAccess {
     private final String SQL_FIND_GENRE_BY_NAME = "SELECT genre_id, name FROM genre WHERE name LIKE ?";
     private final String SQL_FIND_GENRE_BY_ID = "SELECT genre_id, name FROM genre WHERE genre_id = ?";
     private final String SQL_SAVE_GENRE = "INSERT INTO genre (name) VALUES (?)";
+    private final String SQL_UPDATE_GENRE = "UPDATE genre SET name = ? WHERE genre_id = ?";
     private final String SQL_DELETE_GENRE = "DELETE FROM genre WHERE genre_id = ?";
 
     @Override
@@ -121,6 +122,26 @@ public class GenreDataAccessImpl implements GenreDataAccess {
         } catch (SQLException e) {
             throw new RuntimeException("Error al guardar el género", e);
         }
+        return genre;
+    }
+
+    @Override
+    public Genre update(Genre genre) {
+        // Intentamos conectarnos a la BBDD
+        try(Connection connection = ConnectionPool.INSTANCE.getConnection();
+        PreparedStatement preparedStatement = connection.prepareStatement(SQL_UPDATE_GENRE)) {
+
+            // Pasamos los argumentos
+            preparedStatement.setString(1, genre.getName());
+            preparedStatement.setInt(2, genre.getGenreId());
+
+            // Ejecutamos la sentencia
+            preparedStatement.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
         return genre;
     }
 

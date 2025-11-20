@@ -43,6 +43,11 @@ public class GenreServiceImpl implements GenreService {
     }
 
     @Override
+    public Genre update(Genre genre) {
+        return genreDataAccess.update(genre);
+    }
+
+    @Override
     public boolean delete(int id) {
         return genreDataAccess.delete(id);
     }
