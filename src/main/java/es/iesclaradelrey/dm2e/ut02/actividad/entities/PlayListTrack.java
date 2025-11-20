@@ -10,13 +10,7 @@ import lombok.ToString;
 @Setter
 @ToString
 public class PlayListTrack {
-    private int id;
-    private String name;
-    private int albumId;
-    private int mediaTypeId;
-    private int genreId;
-    private String composer;
-    private long milliseconds;
-    private long bytes;
-    private float unitPrice;
+    private int playlistId;
+    private int trackId;
+    private String trackName;
 }

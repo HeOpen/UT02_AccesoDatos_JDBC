@@ -10,9 +10,15 @@ import es.iesclaradelrey.dm2e.ut02.actividad.services.playlist.PlayListService;
 import es.iesclaradelrey.dm2e.ut02.actividad.services.playlist.PlayListServiceImpl;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
 
 public class Main {
+
+    // Declaración de servicios
+    private final static GenreService GENRE_SERVICE = new GenreServiceImpl(new GenreDataAccessImpl());
+    private final static PlayListService PLAYLIST_SERVICE = new PlayListServiceImpl(new PlayListDataAccessImpl());
 
     // Scanner
     private final static Scanner SCANNER = new Scanner(System.in);
@@ -61,40 +67,70 @@ public class Main {
         }
     }
 
-    private final static GenreService GENRE_SERVICE = new GenreServiceImpl(new GenreDataAccessImpl());
-    private final static PlayListService PLAYLIST_SERVICE = new PlayListServiceImpl(new PlayListDataAccessImpl());
+
+    // ----- Métodos para las opciones de menu (con la tabla GENEROS) ----- //
+    private static void buscarTodosGeneros(){
+        GENRE_SERVICE.findAll().forEach(genre -> System.out.printf("%d - %s\n", genre.getGenreId(), genre.getName()));
+    }
+
+    private static void buscarGeneroPorID(){
+        System.out.println("Introduce el ID del género a buscar:");
+        // fixme: ¿¿¿Y si no introduce un número???
+        int id = SCANNER.nextInt();
+        Optional<Genre> genero = GENRE_SERVICE.findById(id);
+
+        // fixme: debería ir en la capa de servicios los checks???
+        if (genero.isPresent()) {
+            System.out.printf("El género con id <%s> es <%s>\n", genero.get().getGenreId(), genero.get().getName());
+        } else {
+            // fixme: throw new RuntimeException(); ??? No lo hace ya el método en dataaccess ???
+        }
+    }
+
+    private static void buscarGeneroPorNombre(){
+        System.out.println("Introduce el nombre del género a buscar:");
+        String nombre = SCANNER.nextLine().trim();
+        List<Genre> posiblesGeneros = GENRE_SERVICE.findByName(nombre);
+
+        if (!posiblesGeneros.isEmpty()) {
+            posiblesGeneros.forEach(genre -> System.out.printf("%d - %s\n", genre.getGenreId(), genre.getName()));
+        } else {
+            System.out.printf("No se encuentran géneros que contengan <%s> en el nombre\n", nombre);
+        }
+    }
+
+    private static void crearNuevoGenero(){
+        System.out.println("Introduce el nombre del nuevo género a guardar");
+        String nombre = SCANNER.nextLine().trim();
+        GENRE_SERVICE.save(new Genre(nombre));
+    }
+
+    private static void modificarGeneroExistente(){}
+    private static void eliminarGeneroPorID(){}
+
+    // ----- Métodos para las opciones de menu (con la tabla PLAYLIST) ----- //
+    private static void crearListaDeReproduccion(){}
+    private static void buscarListaDeReproduccionPorID(){}
+    private static void eliminarListaDeReproduccionPorID(){}
+
+    private static void ejecutarOpcionSeleccionada(int opcion){
+        switch (opcion) {
+            case 0 -> System.exit(0);
+            case 1 -> buscarTodosGeneros();
+            case 2 -> buscarGeneroPorID();
+            case 3 -> buscarGeneroPorNombre();
+            case 4 -> crearNuevoGenero();
+            case 5 -> modificarGeneroExistente();
+            case 6 -> eliminarGeneroPorID();
+            case 7 -> crearListaDeReproduccion();
+            case 8 -> buscarListaDeReproduccionPorID();
+            case 9 -> eliminarListaDeReproduccionPorID();
+        }
+    }
 
     public static void main(String[] args) {
         int opcion = inputOpcion();
-        System.out.printf("Opción seleccionada: %d", opcion);
-
-        // Redirigir a la opción deseada
-        switch (opcion) {
-            case 0 -> System.exit(0);
-
-            case 1 -> GENRE_SERVICE.findAll();
-
-            case 2 -> {
-                System.out.println("Introduce el ID del género");
-                // fixme: ¿¿¿Y si no introduce un número???
-                // fixme: quizas separar cada función mejor y hacer el switch-case con funciones
-                int id = SCANNER.nextInt();
-                GENRE_SERVICE.findById(id);
-            }
-
-            case 3 -> {
-                System.out.println("Introduce el nombre del género");
-                String nombre = SCANNER.nextLine().trim();
-                GENRE_SERVICE.findByName(nombre);
-            }
-
-            case 4 -> {
-                System.out.println("Introduce el nombre del nuevo género a guardar");
-                String nombre = SCANNER.nextLine().trim();
-                GENRE_SERVICE.save(new Genre(nombre));
-            }
-
-            // fixme: ETC para los 9 casos
-        }
+        System.out.printf("Opción seleccionada: %d\n", opcion);
+        ejecutarOpcionSeleccionada(opcion);
     }
 }
