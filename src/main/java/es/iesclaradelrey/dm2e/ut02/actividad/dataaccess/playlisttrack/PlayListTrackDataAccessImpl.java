@@ -14,7 +14,7 @@ public class PlayListTrackDataAccessImpl implements PlayListTrackDataAccess {
 
     // Sentencias
     private final String SQL_FIND_ALL_BY_PLAYLIST_ID = """
-            SELECT p.name, pt.playlist_id, pt.track_id, t.name
+            SELECT p.name as playlist_name, pt.playlist_id, pt.track_id, t.name as track_name
             FROM playlist_track pt
             INNER JOIN track t on t.track_id = pt.track_id
             INNER JOIN playlist p on p.playlist_id = pt.playlist_id
@@ -38,10 +38,10 @@ public class PlayListTrackDataAccessImpl implements PlayListTrackDataAccess {
                 while (resultSet.next()) {
                     playListTracks.add(
                             PlayListTrack.builder()
-                                    .playlistName(resultSet.getString("p.name"))
+                                    .playlistName(resultSet.getString("playlist_name"))
                                     .playlistId(resultSet.getInt("playlist_id"))
                                     .trackId(resultSet.getInt("track_id"))
-                                    .trackName("t.name")
+                                    .trackName(resultSet.getString("track_name"))
                                     .build());
                 }
             }

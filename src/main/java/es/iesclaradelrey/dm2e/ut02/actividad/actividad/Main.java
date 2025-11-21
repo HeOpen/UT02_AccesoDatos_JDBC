@@ -85,6 +85,7 @@ public class Main {
         if (genero.isPresent()) {
             System.out.printf("El género con id <%s> es <%s>\n", genero.get().getGenreId(), genero.get().getName());
         } else {
+            System.out.printf("No se encuentra el género con id <%d>\n", id);
             // fixme: throw new RuntimeException(); ??? No lo hace ya el método en dataaccess ???
         }
     }
@@ -104,7 +105,8 @@ public class Main {
     private static void crearNuevoGenero() {
         System.out.println("Introduce el nombre del nuevo género a guardar");
         String nombre = SCANNER.nextLine().trim();
-        GENRE_SERVICE.save(new Genre(nombre));
+        Genre nuevo = GENRE_SERVICE.save(new Genre(nombre));
+        System.out.printf("Se ha creado el género <%s> con id <%d>",  nuevo.getName(), nuevo.getGenreId());
     }
 
     private static void modificarGeneroExistente() {
