@@ -106,7 +106,7 @@ public class Main {
         System.out.println("Introduce el nombre del nuevo género a guardar");
         String nombre = SCANNER.nextLine().trim();
         Genre nuevo = GENRE_SERVICE.save(new Genre(nombre));
-        System.out.printf("Se ha creado el género <%s> con id <%d>",  nuevo.getName(), nuevo.getGenreId());
+        System.out.printf("Se ha creado el género <%s> con id <%d>", nuevo.getName(), nuevo.getGenreId());
     }
 
     private static void modificarGeneroExistente() {
@@ -181,18 +181,25 @@ public class Main {
         System.out.println("Introduce el id de la lista de reproduccion a mostrar:");
         int id = Integer.parseInt(SCANNER.nextLine().trim());
 
-        // Recogemos la lista generada
-        List<PlayListTrack> playListTracks = PLAYLISTTRACK_SERVICE.findAllByPlayListId(id);
+        // Comprobamos que existe la lista de reproduccion
+        Optional<PlayList> playlist = PLAYLIST_SERVICE.findById(id);
 
-        if (playListTracks.isEmpty()) {
-            System.out.printf("No existe una lista de reproducción con id <%d>\n", id);
+        if (playlist.isPresent()) {
+            // Si existe buscamos las tracks asociadas
+            List<PlayListTrack> playListTracks = PLAYLISTTRACK_SERVICE.findAllByPlayListId(id);
+
+            if (playListTracks.isEmpty()) {
+                System.out.println("No existen tracks asociadas en la lista de reproducción");
+            } else {
+                // Imprimimos la cabecera
+                System.out.printf("Lista de reproducción: %s\n", playlist.get().getPlaylistName());
+                // Imprimimos cada pista de la lista
+                playListTracks.forEach(track -> {
+                    System.out.printf("%d - %s -> %d - %s\n", track.getPlaylistId(), track.getPlaylistName(), track.getTrackId(), track.getTrackName());
+                });
+            }
         } else {
-            // Imprimimos la cabecera
-            System.out.printf("Lista de reproducción: %s\n", playListTracks.getFirst().getPlaylistName());
-            // Imprimimos cada pista de la lista
-            playListTracks.forEach(track -> {
-                System.out.printf("%d - %s -> %d - %s\n", track.getPlaylistId(), track.getPlaylistName(), track.getTrackId(), track.getTrackName());
-            });
+            System.out.printf("No existe una lista de reproducción con id <%d>\n", id);
         }
     }
 
