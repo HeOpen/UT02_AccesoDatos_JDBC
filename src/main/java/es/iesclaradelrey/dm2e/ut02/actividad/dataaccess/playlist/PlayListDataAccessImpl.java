@@ -111,8 +111,9 @@ public class PlayListDataAccessImpl implements PlayListDataAccess {
             preparedStatementTracks.setInt(1, id);
 
             // Ejecutamos la sentencia y aprovechamos a devolver el bool (si hay columnas modificadas o no)
-            int registrosModficiadosPlaylist = preparedStatementPlaylist.executeUpdate();
+            // EL ORDEN IMPORTA !!!
             int registrosModficiadosTrack = preparedStatementTracks.executeUpdate();
+            int registrosModficiadosPlaylist = preparedStatementPlaylist.executeUpdate();
             return registrosModficiadosPlaylist + registrosModficiadosTrack > 0;
 
         } catch (SQLException e) {
