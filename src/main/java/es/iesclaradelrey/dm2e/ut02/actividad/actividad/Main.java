@@ -14,6 +14,7 @@ import es.iesclaradelrey.dm2e.ut02.actividad.services.playlisttrack.PlayListTrac
 import es.iesclaradelrey.dm2e.ut02.actividad.services.playlisttrack.PlayListTrackServiceImpl;
 
 import java.util.*;
+import java.util.logging.Logger;
 
 public class Main {
 
@@ -24,6 +25,12 @@ public class Main {
 
     // Scanner
     private final static Scanner SCANNER = new Scanner(System.in);
+
+    // Tiempo para enseñar el error si es que se lanza alguna excepción
+    private final static Long TIME_TO_SHOW = 3000L;
+
+    // Un logger (por probarlo)
+    private final static Logger LOGGER = Logger.getLogger(Main.class.getName());
 
     // Interfaz / menu principal
     private final static String MAIN_MENU_TEXT =
@@ -77,16 +84,19 @@ public class Main {
 
     private static void buscarGeneroPorID() {
         System.out.println("Introduce el ID del género a buscar:");
-        // fixme: ¿¿¿Y si no introduce un número???
-        int id = SCANNER.nextInt();
-        Optional<Genre> genero = GENRE_SERVICE.findById(id);
+        String inputRecogida = SCANNER.nextLine();
 
-        // fixme: debería ir en la capa de servicios los checks???
-        if (genero.isPresent()) {
-            System.out.printf("El género con id <%s> es <%s>\n", genero.get().getGenreId(), genero.get().getName());
-        } else {
-            System.out.printf("No se encuentra el género con id <%d>\n", id);
-            // fixme: throw new RuntimeException(); ??? No lo hace ya el método en dataaccess ???
+        try {
+            int id = Integer.parseInt(inputRecogida);
+            Optional<Genre> genero = GENRE_SERVICE.findById(id);
+
+            if (genero.isPresent()) {
+                System.out.printf("El género con id <%s> es <%s>\n", genero.get().getGenreId(), genero.get().getName());
+            } else {
+                System.out.printf("No se encuentra el género con id <%d>\n", id);
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Debes introducir un número entero.");
         }
     }
 
@@ -105,8 +115,13 @@ public class Main {
     private static void crearNuevoGenero() {
         System.out.println("Introduce el nombre del nuevo género a guardar");
         String nombre = SCANNER.nextLine().trim();
-        Genre nuevo = GENRE_SERVICE.save(new Genre(nombre));
-        System.out.printf("Se ha creado el género <%s> con id <%d>", nuevo.getName(), nuevo.getGenreId());
+        try {
+            Genre nuevo = GENRE_SERVICE.save(new Genre(nombre));
+            System.out.printf("Se ha creado el género <%s> con id <%d>", nuevo.getName(), nuevo.getGenreId());
+        } catch (RuntimeException e) {
+            // Recogemos el throw new RuntimeException("Error al guardar el género", e); de GenreDataAccessImpl
+            System.out.printf("Error en la operación <%s>\n", e.getMessage());
+        }
     }
 
     private static void modificarGeneroExistente() {
@@ -125,8 +140,12 @@ public class Main {
             String nombreNuevo = SCANNER.nextLine().trim();
 
             // Ejecutamos la sentencia
-            GENRE_SERVICE.update(new Genre(id, nombreNuevo));
-            System.out.printf("Se ha modificado el género <%s>. Su nuevo nombre es <%s>\n", nombreAntiguo, nombreNuevo);
+            try {
+                GENRE_SERVICE.update(new Genre(id, nombreNuevo));
+                System.out.printf("Se ha modificado el género <%s>. Su nuevo nombre es <%s>\n", nombreAntiguo, nombreNuevo);
+            } catch (RuntimeException e) {
+                System.out.printf("Error en la operación <%s>\n", e.getMessage());
+            }
 
         } else {
             System.out.printf("No existe el género con id <%d>\n", id);
@@ -143,8 +162,12 @@ public class Main {
 
         if (genre.isPresent()) {
             // Ejecutamos la sentencia
-            GENRE_SERVICE.delete(id);
-            System.out.printf("Se ha eliminado el género con id <%s>\n", genre.get().getGenreId());
+            try {
+                GENRE_SERVICE.delete(id);
+                System.out.printf("Se ha eliminado el género con id <%s>\n", genre.get().getGenreId());
+            } catch (RuntimeException e) {
+                System.out.printf("Error en la operación <%s>\n", e.getMessage());
+            }
 
         } else {
             System.out.printf("No existe el género con id <%d>\n", id);
@@ -173,7 +196,11 @@ public class Main {
         });
 
         // Llamamos al servicio
-        PLAYLIST_SERVICE.save(PlayList.builder().playlistName(nombre).tracks(listadoTracks).build());
+        try {
+            PLAYLIST_SERVICE.save(PlayList.builder().playlistName(nombre).tracks(listadoTracks).build());
+        } catch (RuntimeException e) {
+            System.out.printf("Error en la operación <%s>\n", e.getMessage());
+        }
     }
 
     private static void buscarListaDeReproduccionPorID() {
@@ -182,24 +209,36 @@ public class Main {
         int id = Integer.parseInt(SCANNER.nextLine().trim());
 
         // Comprobamos que existe la lista de reproduccion
-        Optional<PlayList> playlist = PLAYLIST_SERVICE.findById(id);
+        try {
+            Optional<PlayList> playlist = PLAYLIST_SERVICE.findById(id);
 
-        if (playlist.isPresent()) {
-            // Si existe buscamos las tracks asociadas
-            List<PlayListTrack> playListTracks = PLAYLISTTRACK_SERVICE.findAllByPlayListId(id);
+            if (playlist.isPresent()) {
+                // Si existe buscamos las tracks asociadas
+                try {
 
-            if (playListTracks.isEmpty()) {
-                System.out.println("No existen tracks asociadas en la lista de reproducción");
+                    List<PlayListTrack> playListTracks = PLAYLISTTRACK_SERVICE.findAllByPlayListId(id);
+
+                    if (playListTracks.isEmpty()) {
+                        System.out.println("No existen tracks asociadas en la lista de reproducción");
+                    } else {
+                        // Imprimimos la cabecera
+                        System.out.printf("Lista de reproducción: %s\n", playlist.get().getPlaylistName());
+                        // Imprimimos cada pista de la lista
+                        playListTracks.forEach(track -> {
+                            System.out.printf("%d - %s -> %d - %s\n", track.getPlaylistId(), track.getPlaylistName(), track.getTrackId(), track.getTrackName());
+                        });
+                    }
+
+                } catch (RuntimeException e) {
+                    System.out.printf("Error en la operación <%s>\n", e.getMessage());
+                }
+
             } else {
-                // Imprimimos la cabecera
-                System.out.printf("Lista de reproducción: %s\n", playlist.get().getPlaylistName());
-                // Imprimimos cada pista de la lista
-                playListTracks.forEach(track -> {
-                    System.out.printf("%d - %s -> %d - %s\n", track.getPlaylistId(), track.getPlaylistName(), track.getTrackId(), track.getTrackName());
-                });
+                System.out.printf("No existe una lista de reproducción con id <%d>\n", id);
             }
-        } else {
-            System.out.printf("No existe una lista de reproducción con id <%d>\n", id);
+
+        } catch (RuntimeException e) {
+            System.out.printf("Error en la operación <%s>\n", e.getMessage());
         }
     }
 
@@ -209,35 +248,93 @@ public class Main {
         int id = Integer.parseInt(SCANNER.nextLine().trim());
 
         // Instanciamos un 'optional' para ver si existe
-        Optional<PlayList> lista = PLAYLIST_SERVICE.findById(id);
+        try {
 
-        // Si devuelve diferente de 'isEmpty' la eliminamos
-        if (lista.isPresent()) {
-            PLAYLIST_SERVICE.delete(id);
-            System.out.printf("Se ha eliminado la lista con id <%d>\n", id);
-        } else {
-            System.out.printf("No existe la lista de reproducción con id <%d>\n>", id);
+            Optional<PlayList> lista = PLAYLIST_SERVICE.findById(id);
+
+            // Si devuelve diferente de 'isEmpty' la eliminamos
+            if (lista.isPresent()) {
+                PLAYLIST_SERVICE.delete(id);
+                System.out.printf("Se ha eliminado la lista con id <%d>\n", id);
+            } else {
+                System.out.printf("No existe la lista de reproducción con id <%d>\n>", id);
+            }
+
+        } catch (RuntimeException e) {
+            System.out.printf("Error en la operación <%s>\n", e.getMessage());
         }
     }
 
     private static void ejecutarOpcionSeleccionada(int opcion) {
         switch (opcion) {
-            case 0 -> System.exit(0);
-            case 1 -> buscarTodosGeneros();
-            case 2 -> buscarGeneroPorID();
-            case 3 -> buscarGeneroPorNombre();
-            case 4 -> crearNuevoGenero();
-            case 5 -> modificarGeneroExistente();
-            case 6 -> eliminarGeneroPorID();
-            case 7 -> crearListaDeReproduccion();
-            case 8 -> buscarListaDeReproduccionPorID();
-            case 9 -> eliminarListaDeReproduccionPorID();
+            case 0 -> {
+                System.out.printf("Opción seleccionada: %d (SALIENDO DEL PROGRAMA...)\n", opcion);
+                System.exit(0);
+            }
+            case 1 -> {
+                System.out.printf("Opción seleccionada: %d (buscar TODOS los géneros)\n", opcion);
+                buscarTodosGeneros();
+                volverMainMenu();
+            }
+            case 2 -> {
+                System.out.printf("Opción seleccionada: %d (buscar género por ID)\n", opcion);
+                buscarGeneroPorID();
+                volverMainMenu();
+            }
+            case 3 -> {
+                System.out.printf("Opción seleccionada: %d (buscar género por NOMBRE)\n", opcion);
+                buscarGeneroPorNombre();
+                volverMainMenu();
+            }
+            case 4 -> {
+                System.out.printf("Opción seleccionada: %d (crear NUEVO género)\n", opcion);
+                crearNuevoGenero();
+                volverMainMenu();
+            }
+            case 5 -> {
+                System.out.printf("Opción seleccionada: %d (MODIFICAR género por ID)\n", opcion);
+                modificarGeneroExistente();
+                volverMainMenu();
+            }
+            case 6 -> {
+                System.out.printf("Opción seleccionada: %d (ELIMINAR género por ID)\n", opcion);
+                eliminarGeneroPorID();
+                volverMainMenu();
+            }
+            case 7 -> {
+                System.out.printf("Opción seleccionada: %d (crear NUEVA lista de reproducción)\n", opcion);
+                crearListaDeReproduccion();
+                volverMainMenu();
+            }
+            case 8 -> {
+                System.out.printf("Opción seleccionada: %d (buscar lista por ID)\n", opcion);
+                buscarListaDeReproduccionPorID();
+                volverMainMenu();
+            }
+            case 9 -> {
+                System.out.printf("Opción seleccionada: %d (eliminar lista por ID)\n", opcion);
+                eliminarListaDeReproduccionPorID();
+                volverMainMenu();
+            }
         }
     }
 
-    public static void main(String[] args) {
+    private static void seleccionarNuevaOpcion() {
         int opcion = inputOpcion();
-        System.out.printf("Opción seleccionada: %d\n", opcion);
         ejecutarOpcionSeleccionada(opcion);
+    }
+
+    private static void volverMainMenu() {
+        try {
+            System.out.println("Volviendo a la pantalla principal");
+            Thread.sleep(TIME_TO_SHOW);
+        } catch (InterruptedException ex) {
+            LOGGER.info(ex.getMessage());
+        }
+        seleccionarNuevaOpcion();
+    }
+
+    public static void main(String[] args) {
+        seleccionarNuevaOpcion();
     }
 }

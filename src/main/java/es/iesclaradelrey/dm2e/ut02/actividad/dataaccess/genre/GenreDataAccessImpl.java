@@ -158,7 +158,7 @@ public class GenreDataAccessImpl implements GenreDataAccess {
             return preparedStatement.executeUpdate() > 0;
 
         } catch (SQLException e) {
-            throw new RuntimeException("Error eliminar el género", e);
+            throw new RuntimeException("Error al eliminar el género", e);
         }
     }
 }
