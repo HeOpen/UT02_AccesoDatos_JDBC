@@ -337,6 +337,11 @@ public class Main {
         switch (opcion) {
             case 0 -> {
                 System.out.printf("Opción seleccionada: %d (SALIENDO DEL PROGRAMA...)\n", opcion);
+                // Fin de programa
+                Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                    System.out.println("Cerrando pool de conexiones...");
+                    ConnectionPool.INSTANCE.closePool();
+                }));
                 System.exit(0);
             }
             case 1 -> {
@@ -404,11 +409,5 @@ public class Main {
 
     public static void main(String[] args) {
         seleccionarNuevaOpcion();
-
-        // Fin de programa
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            System.out.println("Cerrando pool de conexiones...");
-            ConnectionPool.INSTANCE.closePool();
-        }));
     }
 }
