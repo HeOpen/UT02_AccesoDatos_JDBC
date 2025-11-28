@@ -1,3 +1,11 @@
+/**
+ * Clase principal que gestiona la aplicación de Gestión de Géneros y Listas de Reproducción.
+ * Proporciona una interfaz de consola para realizar operaciones CRUD sobre géneros musicales
+ * y listas de reproducción, así como la gestión de tracks en las listas.
+ *
+ * @author Jose Luis Espadas, Eliabe Olah, Ismael Feito
+ * @version 1.0
+ */
 package es.iesclaradelrey.dm2e.ut02.actividad.actividad;
 
 import es.iesclaradelrey.dm2e.ut02.actividad.dataaccess.genre.GenreDataAccessImpl;
@@ -19,21 +27,21 @@ import java.util.logging.Logger;
 
 public class Main {
 
-    // Declaración de servicios
+    // Declaración de servicios para acceso a datos
     private final static GenreService GENRE_SERVICE = new GenreServiceImpl(new GenreDataAccessImpl());
     private final static PlayListService PLAYLIST_SERVICE = new PlayListServiceImpl(new PlayListDataAccessImpl());
     private final static PlayListTrackService PLAYLISTTRACK_SERVICE = new PlayListTrackServiceImpl(new PlayListTrackDataAccessImpl());
 
-    // Scanner
+    // Scanner para entrada de usuario
     private final static Scanner SCANNER = new Scanner(System.in);
 
-    // Tiempo para enseñar el error si es que se lanza alguna excepción
+    // Tiempo de espera para mostrar mensajes antes de volver al menú principal (en milisegundos)
     private final static Long TIME_TO_SHOW = 3000L;
 
-    // Un logger (por probarlo)
+    // Logger para registro de eventos y errores
     private final static Logger LOGGER = Logger.getLogger(Main.class.getName());
 
-    // Interfaz / menu principal
+    // Texto del menú principal
     private final static String MAIN_MENU_TEXT =
             """
                     GESTIÓN DE GÉNEROS Y LISTAS DE REPRODUCCIÓN
@@ -51,7 +59,12 @@ public class Main {
                     Seleccione una opción:
                     """;
 
-    // Método para recoger un número por consola
+    /**
+     * Solicita al usuario que seleccione una opción del menú principal.
+     * Valida que la entrada sea un número entero dentro del rango permitido (0-9).
+     *
+     * @return La opción seleccionada por el usuario como entero
+     */
     private static int inputOpcion() {
 
         // Bucle para pedir número en caso de fallar por formato
@@ -79,10 +92,19 @@ public class Main {
 
 
     // ----- Métodos para las opciones de menu (con la tabla GENEROS) ----- //
+
+    /**
+     * Muestra todos los géneros musicales existentes en la base de datos.
+     * Formato: ID - Nombre
+     */
     private static void buscarTodosGeneros() {
         GENRE_SERVICE.findAll().forEach(genre -> System.out.printf("%d - %s\n", genre.getGenreId(), genre.getName()));
     }
 
+    /**
+     * Busca un género musical por su ID y muestra su información.
+     * Solicita al usuario que introduzca el ID del género a buscar.
+     */
     private static void buscarGeneroPorID() {
         System.out.println("Introduce el ID del género a buscar:");
         String inputRecogida = SCANNER.nextLine();
@@ -101,6 +123,10 @@ public class Main {
         }
     }
 
+    /**
+     * Busca géneros musicales que contengan el texto especificado en su nombre.
+     * Muestra todos los géneros que coincidan con el criterio de búsqueda.
+     */
     private static void buscarGeneroPorNombre() {
         System.out.println("Introduce el nombre del género a buscar:");
         String nombre = SCANNER.nextLine().trim();
@@ -121,6 +147,10 @@ public class Main {
         }
     }
 
+    /**
+     * Crea un nuevo género musical con el nombre especificado por el usuario.
+     * Valida que el nombre no esté vacío antes de realizar la operación.
+     */
     private static void crearNuevoGenero() {
         System.out.println("Introduce el nombre del nuevo género a guardar");
         String nombre = SCANNER.nextLine().trim();
@@ -141,6 +171,11 @@ public class Main {
         }
     }
 
+    /**
+     * Modifica el nombre de un género musical existente.
+     * Solicita al usuario el ID del género a modificar y el nuevo nombre.
+     * Valida que el nuevo nombre sea diferente al actual y no esté vacío.
+     */
     private static void modificarGeneroExistente() {
         System.out.println("Introduce el ID del género a modificar:");
         String inputRecogida = SCANNER.nextLine().trim();
@@ -188,6 +223,10 @@ public class Main {
 
     }
 
+    /**
+     * Elimina un género musical por su ID.
+     * Solicita al usuario el ID del género a eliminar y confirma su existencia antes de proceder.
+     */
     private static void eliminarGeneroPorID() {
         System.out.println("Introduce el ID del género a eliminar:");
         String inputRecogida = SCANNER.nextLine().trim();
@@ -217,6 +256,12 @@ public class Main {
     }
 
     // ----- Métodos para las opciones de menu (con la tabla PLAYLIST) ----- //
+
+    /**
+     * Crea una nueva lista de reproducción con el nombre y tracks especificados.
+     * Los tracks se introducen como una lista de IDs separados por comas.
+     * Valida que el nombre no esté vacío y que se especifique al menos un track.
+     */
     private static void crearListaDeReproduccion() {
         // Recogemos el nombre de la nueva lista
         System.out.println("Introduce el nombre de la nueva lista de reproduccion:");
@@ -259,6 +304,10 @@ public class Main {
         }
     }
 
+    /**
+     * Busca una lista de reproducción por su ID y muestra su información completa,
+     * incluyendo todos los tracks que contiene.
+     */
     private static void buscarListaDeReproduccionPorID() {
         // Recogemos el ID de la lista de reproducción
         System.out.println("Introduce el id de la lista de reproduccion a mostrar:");
@@ -304,6 +353,10 @@ public class Main {
         }
     }
 
+    /**
+     * Elimina una lista de reproducción por su ID.
+     * Solicita al usuario el ID de la lista a eliminar y confirma su existencia antes de proceder.
+     */
     private static void eliminarListaDeReproduccionPorID() {
         // Recogemos el ID de la lista de reproducción
         System.out.println("Introduce el id de la lista de reproduccion a eliminar:");
@@ -333,6 +386,11 @@ public class Main {
         }
     }
 
+    /**
+     * Ejecuta la opción seleccionada por el usuario en el menú principal.
+     *
+     * @param opcion La opción seleccionada (0-9)
+     */
     private static void ejecutarOpcionSeleccionada(int opcion) {
         switch (opcion) {
             case 0 -> {
@@ -392,11 +450,18 @@ public class Main {
         }
     }
 
+    /**
+     * Solicita al usuario que seleccione una nueva opción del menú y la ejecuta.
+     */
     private static void seleccionarNuevaOpcion() {
         int opcion = inputOpcion();
         ejecutarOpcionSeleccionada(opcion);
     }
 
+    /**
+     * Muestra un mensaje y espera un tiempo determinado antes de volver al menú principal.
+     * Utiliza el tiempo definido en TIME_TO_SHOW.
+     */
     private static void volverMainMenu() {
         try {
             System.out.println("Volviendo a la pantalla principal");
@@ -407,6 +472,11 @@ public class Main {
         seleccionarNuevaOpcion();
     }
 
+    /**
+     * Método principal que inicia la aplicación.
+     *
+     * @param args Argumentos de línea de comandos (no utilizados)
+     */
     public static void main(String[] args) {
         seleccionarNuevaOpcion();
     }

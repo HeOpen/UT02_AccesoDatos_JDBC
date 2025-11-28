@@ -1,3 +1,12 @@
+/**
+ * Implementación concreta de la interfaz PlayListDataAccess.
+ * Proporciona la lógica de acceso a datos para la entidad PlayList utilizando JDBC.
+ * Maneja operaciones transaccionales para garantizar la consistencia de datos
+ * al crear y eliminar listas de reproducción con sus tracks asociados.
+ *
+ * @author Jose Luis Espadas, Eliabe Olah, Ismael Feito
+ * @version 1.0
+ */
 package es.iesclaradelrey.dm2e.ut02.actividad.dataaccess.playlist;
 
 import es.iesclaradelrey.dm2e.ut02.actividad.entities.PlayList;
@@ -8,13 +17,17 @@ import java.sql.*;
 import java.util.Optional;
 
 public class PlayListDataAccessImpl implements PlayListDataAccess {
-    // Sentencias
+
+    // Sentencias SQL predefinidas para mejorar legibilidad y mantenibilidad
     private final String SQL_FIND_BY_ID = "SELECT playlist_id, name FROM playlist WHERE playlist_id = ?";
     private final String SQL_SAVE_INTO_TABLE_PLAYLIST = "INSERT INTO playlist (name) VALUES (?)";
     private final String SQL_SAVE_INTO_TABLE_PLAYLIST_TRACK = "INSERT INTO playlist_track (playlist_id, track_id) VALUES (?, ?)";
     private final String SQL_DELETE_FROM_TABLE_PLAYLIST = "DELETE FROM playlist WHERE playlist_id = ?";
     private final String SQL_DELETE_FROM_TABLE_PLAYLIST_TRACK = "DELETE FROM playlist_track WHERE playlist_id = ?";
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Optional<PlayList> findById(int id) {
         // Intentamos conectarnos a la BBDD
@@ -27,7 +40,10 @@ public class PlayListDataAccessImpl implements PlayListDataAccess {
             // Intentamos encontrar resultados
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
-                    return Optional.of(PlayList.builder().playlistId(resultSet.getInt("playlist_id")).playlistName(resultSet.getString("name")).build());
+                    return Optional.of(PlayList.builder()
+                            .playlistId(resultSet.getInt("playlist_id"))
+                            .playlistName(resultSet.getString("name"))
+                            .build());
                 }
             }
 
@@ -39,12 +55,20 @@ public class PlayListDataAccessImpl implements PlayListDataAccess {
         return Optional.empty();
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * Implementa una operación transaccional que:
+     * 1. Inserta la nueva lista de reproducción en la tabla 'playlist'
+     * 2. Inserta todas las relaciones con tracks en la tabla 'playlist_track'
+     * 3. Realiza rollback en caso de error para mantener la consistencia de datos
+     */
     @Override
     public PlayList save(PlayList playList) {
         // Intentamos conectarnos a la BBDD
         try (Connection connection = ConnectionPool.INSTANCE.getConnection()) {
 
-            // Desactivamos el auto-commit
+            // Desactivamos el auto-commit para manejar la transacción manualmente
             connection.setAutoCommit(false);
 
             // Preparamos las consultas
@@ -64,7 +88,7 @@ public class PlayListDataAccessImpl implements PlayListDataAccess {
                     }
                 }
 
-                // ----- Segundo: con el ID generado, insertamos la relacion entre la playlist y sus tracks ----- //
+                // ----- Segundo: con el ID generado, insertamos la relación entre la playlist y sus tracks ----- //
                 // Por cada track en su lista, hacemos un insert del ID del track
                 try {
 
@@ -88,6 +112,7 @@ public class PlayListDataAccessImpl implements PlayListDataAccess {
                     connection.commit();
 
                 } catch (SQLException e) {
+                    // Si hay error, revertimos todos los cambios
                     connection.rollback();
                     throw new RuntimeException("Error al intentar guardar cada track ID con su playlist ID", e);
                 }
@@ -95,7 +120,7 @@ public class PlayListDataAccessImpl implements PlayListDataAccess {
             } catch (SQLException e) {
                 throw new RuntimeException("Falló la consulta", e);
             } finally {
-                // Por lo visto si es necesario restaurar el auto-commit antes de devolver la conexión al pool
+                // Restauramos el auto-commit antes de devolver la conexión al pool
                 connection.setAutoCommit(true);
             }
 
@@ -107,6 +132,14 @@ public class PlayListDataAccessImpl implements PlayListDataAccess {
         return playList;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * Implementa una operación que elimina tanto la lista de reproducción
+     * como todas sus relaciones con tracks. El orden de eliminación es importante:
+     * primero se eliminan las relaciones en 'playlist_track' y luego la lista en 'playlist'
+     * para respetar las restricciones de integridad referencial.
+     */
     @Override
     public boolean delete(int id) {
         // Intentamos conectar a la BBDD
@@ -114,14 +147,16 @@ public class PlayListDataAccessImpl implements PlayListDataAccess {
              PreparedStatement preparedStatementPlaylist = connection.prepareStatement(SQL_DELETE_FROM_TABLE_PLAYLIST);
              PreparedStatement preparedStatementTracks = connection.prepareStatement(SQL_DELETE_FROM_TABLE_PLAYLIST_TRACK)) {
 
-            // Pasamos el argumento (ID)
+            // Pasamos el argumento (ID) a ambos prepared statements
             preparedStatementPlaylist.setInt(1, id);
             preparedStatementTracks.setInt(1, id);
 
-            // Ejecutamos la sentencia y aprovechamos a devolver el bool (si hay columnas modificadas o no)
-            // EL ORDEN IMPORTA !!!
+            // Ejecutamos las sentencias y aprovechamos a devolver el bool (si hay columnas modificadas o no)
+            // EL ORDEN IMPORTA: primero eliminamos las relaciones, luego la lista principal
             int registrosModificadosTrack = preparedStatementTracks.executeUpdate();
             int registrosModificadosPlaylist = preparedStatementPlaylist.executeUpdate();
+
+            // Consideramos la operación exitosa si se modificó al menos un registro
             return registrosModificadosPlaylist + registrosModificadosTrack > 0;
 
         } catch (SQLException e) {

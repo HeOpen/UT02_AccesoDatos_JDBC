@@ -1,3 +1,11 @@
+/**
+ * Implementación concreta de la interfaz PlayListTrackDataAccess.
+ * Proporciona la lógica de acceso a datos para las relaciones entre listas de reproducción y tracks.
+ * Utiliza JOINs entre tablas para obtener información completa de tracks y listas de reproducción.
+ *
+ * @author Jose Luis Espadas, Eliabe Olah, Ismael Feito
+ * @version 1.0
+ */
 package es.iesclaradelrey.dm2e.ut02.actividad.dataaccess.playlisttrack;
 
 import es.iesclaradelrey.dm2e.ut02.actividad.entities.PlayListTrack;
@@ -12,7 +20,7 @@ import java.util.List;
 
 public class PlayListTrackDataAccessImpl implements PlayListTrackDataAccess {
 
-    // Sentencias
+    // Sentencia SQL que utiliza JOINs para obtener información completa de tracks y playlists
     private final String SQL_FIND_ALL_BY_PLAYLIST_ID = """
             SELECT p.name as playlist_name, pt.playlist_id, pt.track_id, t.name as track_name
             FROM playlist_track pt
@@ -21,6 +29,17 @@ public class PlayListTrackDataAccessImpl implements PlayListTrackDataAccess {
             WHERE pt.playlist_id = ?;
             """;
 
+    /**
+     * {@inheritDoc}
+     *
+     * Realiza una consulta que combina información de tres tablas:
+     * - playlist_track: relación entre playlists y tracks
+     * - track: información de los tracks
+     * - playlist: información de la lista de reproducción
+     *
+     * @param playListId Identificador de la lista de reproducción cuyos tracks se quieren recuperar
+     * @return Lista de objetos PlayListTrack con información completa de cada track y la playlist
+     */
     @Override
     public List<PlayListTrack> findAllByPlayListId(int playListId) {
         // Inicializamos una lista vacia
@@ -49,7 +68,6 @@ public class PlayListTrackDataAccessImpl implements PlayListTrackDataAccess {
         } catch (SQLException e) {
             throw new RuntimeException("No se ha podido realizar la conexión a la BBDD", e);
         }
-
 
         return playListTracks;
     }

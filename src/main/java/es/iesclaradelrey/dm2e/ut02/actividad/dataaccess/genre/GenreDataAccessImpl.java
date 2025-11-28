@@ -1,3 +1,11 @@
+/**
+ * Implementación concreta de la interfaz GenreDataAccess.
+ * Proporciona la lógica de acceso a datos para la entidad Genre utilizando JDBC.
+ * Utiliza PreparedStatement para prevenir inyecciones SQL y mejorar el rendimiento.
+ *
+ * @author Jose Luis Espadas, Eliabe Olah, Ismael Feito
+ * @version 1.0
+ */
 package es.iesclaradelrey.dm2e.ut02.actividad.dataaccess.genre;
 
 import es.iesclaradelrey.dm2e.ut02.actividad.entities.Genre;
@@ -10,7 +18,7 @@ import java.util.Optional;
 
 public class GenreDataAccessImpl implements GenreDataAccess {
 
-    // Sentencias
+    // Sentencias SQL predefinidas para mejorar legibilidad y mantenibilidad
     private final String SQL_FIND_ALL_GENRES = "SELECT genre_id, name FROM genre";
     private final String SQL_FIND_GENRE_BY_NAME = "SELECT genre_id, name FROM genre WHERE name LIKE ?";
     private final String SQL_FIND_GENRE_BY_ID = "SELECT genre_id, name FROM genre WHERE genre_id = ?";
@@ -18,6 +26,9 @@ public class GenreDataAccessImpl implements GenreDataAccess {
     private final String SQL_UPDATE_GENRE = "UPDATE genre SET name = ? WHERE genre_id = ?";
     private final String SQL_DELETE_GENRE = "DELETE FROM genre WHERE genre_id = ?";
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<Genre> findAll() {
         // Inicializamos la lista general
@@ -42,6 +53,9 @@ public class GenreDataAccessImpl implements GenreDataAccess {
         return genres;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<Genre> findByName(String name) {
         // Inicializamos la lista con potenciales coincidencias
@@ -53,6 +67,7 @@ public class GenreDataAccessImpl implements GenreDataAccess {
              PreparedStatement preparedStatement = connection.prepareStatement(SQL_FIND_GENRE_BY_NAME)) {
 
             // Pasamos el argumento de la función al PreparedStatement para completar la consulta
+            // Usamos comodines % para buscar coincidencias parciales
             preparedStatement.setString(1, "%" + name + "%");
 
             // Intentamos encontrar resultados
@@ -69,6 +84,9 @@ public class GenreDataAccessImpl implements GenreDataAccess {
         return genres;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Optional<Genre> findById(int id) {
         // Intentamos conectarnos a la BBDD
@@ -95,12 +113,18 @@ public class GenreDataAccessImpl implements GenreDataAccess {
         return Optional.empty();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean existsById(int id) {
         // Si el método anterior ha encontrado algo, entonces existe (el Optional está presente / no está vacío)
         return findById(id).isPresent();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Genre save(Genre genre) {
         // Intentamos conectarnos a la BBDD
@@ -125,11 +149,14 @@ public class GenreDataAccessImpl implements GenreDataAccess {
         return genre;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Genre update(Genre genre) {
         // Intentamos conectarnos a la BBDD
         try(Connection connection = ConnectionPool.INSTANCE.getConnection();
-        PreparedStatement preparedStatement = connection.prepareStatement(SQL_UPDATE_GENRE)) {
+            PreparedStatement preparedStatement = connection.prepareStatement(SQL_UPDATE_GENRE)) {
 
             // Pasamos los argumentos
             preparedStatement.setString(1, genre.getName());
@@ -145,6 +172,9 @@ public class GenreDataAccessImpl implements GenreDataAccess {
         return genre;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean delete(int id) {
         // Intentamos conectarnos a la BBDD
