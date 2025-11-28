@@ -47,7 +47,7 @@ public class PlayListTrackDataAccessImpl implements PlayListTrackDataAccess {
             }
 
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("No se ha podido realizar la conexión a la BBDD", e);
         }
 
 

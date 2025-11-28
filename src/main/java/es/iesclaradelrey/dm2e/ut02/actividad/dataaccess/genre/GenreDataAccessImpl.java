@@ -139,7 +139,7 @@ public class GenreDataAccessImpl implements GenreDataAccess {
             preparedStatement.executeUpdate();
 
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Error al modificar el género", e);
         }
 
         return genre;

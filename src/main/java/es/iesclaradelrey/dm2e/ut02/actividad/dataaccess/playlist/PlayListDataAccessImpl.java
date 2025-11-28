@@ -125,7 +125,7 @@ public class PlayListDataAccessImpl implements PlayListDataAccess {
             return registrosModficiadosPlaylist + registrosModficiadosTrack > 0;
 
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("No se ha podido realizar la conexión a la BBDD", e);
         }
     }
 }
