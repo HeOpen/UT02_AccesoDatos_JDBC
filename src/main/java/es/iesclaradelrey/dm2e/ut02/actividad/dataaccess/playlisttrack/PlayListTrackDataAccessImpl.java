@@ -1,7 +1,7 @@
 package es.iesclaradelrey.dm2e.ut02.actividad.dataaccess.playlisttrack;
 
 import es.iesclaradelrey.dm2e.ut02.actividad.entities.PlayListTrack;
-import es.iesclaradelrey.dm2e.ut02.actividad.util.ConnectionPool;
+import es.iesclaradelrey.dm2e.ut02.actividad.utils.ConnectionPool;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

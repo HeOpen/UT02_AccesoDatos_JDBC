@@ -1,7 +1,7 @@
 package es.iesclaradelrey.dm2e.ut02.actividad.dataaccess.genre;
 
 import es.iesclaradelrey.dm2e.ut02.actividad.entities.Genre;
-import es.iesclaradelrey.dm2e.ut02.actividad.util.ConnectionPool;
+import es.iesclaradelrey.dm2e.ut02.actividad.utils.ConnectionPool;
 
 import java.sql.*;
 import java.util.ArrayList;

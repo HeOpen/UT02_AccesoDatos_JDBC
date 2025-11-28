@@ -2,7 +2,7 @@ package es.iesclaradelrey.dm2e.ut02.actividad.dataaccess.playlist;
 
 import es.iesclaradelrey.dm2e.ut02.actividad.entities.PlayList;
 import es.iesclaradelrey.dm2e.ut02.actividad.entities.PlayListTrack;
-import es.iesclaradelrey.dm2e.ut02.actividad.util.ConnectionPool;
+import es.iesclaradelrey.dm2e.ut02.actividad.utils.ConnectionPool;
 
 import java.sql.*;
 import java.util.Optional;

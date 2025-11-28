@@ -12,7 +12,7 @@ import es.iesclaradelrey.dm2e.ut02.actividad.services.playlist.PlayListService;
 import es.iesclaradelrey.dm2e.ut02.actividad.services.playlist.PlayListServiceImpl;
 import es.iesclaradelrey.dm2e.ut02.actividad.services.playlisttrack.PlayListTrackService;
 import es.iesclaradelrey.dm2e.ut02.actividad.services.playlisttrack.PlayListTrackServiceImpl;
-import es.iesclaradelrey.dm2e.ut02.actividad.util.ConnectionPool;
+import es.iesclaradelrey.dm2e.ut02.actividad.utils.ConnectionPool;
 
 import java.util.*;
 import java.util.logging.Logger;
