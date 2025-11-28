@@ -126,51 +126,63 @@ public class Main {
 
     private static void modificarGeneroExistente() {
         System.out.println("Introduce el ID del género a modificar:");
-        int id = Integer.parseInt(SCANNER.nextLine().trim());
+        String inputRecogida = SCANNER.nextLine().trim();
 
-        // Instanciamos un 'optional' para ver qué nos devuelve
-        Optional<Genre> genre = GENRE_SERVICE.findById(id);
+        try {
+            int id = Integer.parseInt(inputRecogida);
 
-        if (genre.isPresent()) {
-            // Guardamos el anterior nombre
-            String nombreAntiguo = genre.get().getName();
+            // Instanciamos un 'optional' para ver qué nos devuelve
+            Optional<Genre> genre = GENRE_SERVICE.findById(id);
 
-            // Guardamos el nuevo nombre
-            System.out.println("¿Que nombre debería tener este género?:");
-            String nombreNuevo = SCANNER.nextLine().trim();
+            if (genre.isPresent()) {
+                // Guardamos el anterior nombre
+                String nombreAntiguo = genre.get().getName();
 
-            // Ejecutamos la sentencia
-            try {
-                GENRE_SERVICE.update(new Genre(id, nombreNuevo));
-                System.out.printf("Se ha modificado el género <%s>. Su nuevo nombre es <%s>\n", nombreAntiguo, nombreNuevo);
-            } catch (RuntimeException e) {
-                System.out.printf("Error en la operación <%s>\n", e.getMessage());
+                // Guardamos el nuevo nombre
+                System.out.println("¿Que nombre debería tener este género?:");
+                String nombreNuevo = SCANNER.nextLine().trim();
+
+                // Ejecutamos la sentencia
+                try {
+                    GENRE_SERVICE.update(new Genre(id, nombreNuevo));
+                    System.out.printf("Se ha modificado el género <%s>. Su nuevo nombre es <%s>\n", nombreAntiguo, nombreNuevo);
+                } catch (RuntimeException e) {
+                    System.out.printf("Error en la operación <%s>\n", e.getMessage());
+                }
+
+            } else {
+                System.out.printf("No existe el género con id <%d>\n", id);
             }
-
-        } else {
-            System.out.printf("No existe el género con id <%d>\n", id);
+        } catch (NumberFormatException e) {
+            System.out.println("Debes introducir un número entero.");
         }
 
     }
 
     private static void eliminarGeneroPorID() {
         System.out.println("Introduce el ID del género a eliminar:");
-        int id = Integer.parseInt(SCANNER.nextLine().trim());
+        String inputRecogida = SCANNER.nextLine().trim();
 
-        // Instanciamos un 'optional' para ver qué nos devuelve
-        Optional<Genre> genre = GENRE_SERVICE.findById(id);
+        try {
+            int id = Integer.parseInt(inputRecogida);
 
-        if (genre.isPresent()) {
-            // Ejecutamos la sentencia
-            try {
-                GENRE_SERVICE.delete(id);
-                System.out.printf("Se ha eliminado el género con id <%s>\n", genre.get().getGenreId());
-            } catch (RuntimeException e) {
-                System.out.printf("Error en la operación <%s>\n", e.getMessage());
+            // Instanciamos un 'optional' para ver qué nos devuelve
+            Optional<Genre> genre = GENRE_SERVICE.findById(id);
+
+            if (genre.isPresent()) {
+                // Ejecutamos la sentencia
+                try {
+                    GENRE_SERVICE.delete(id);
+                    System.out.printf("Se ha eliminado el género con id <%s>\n", genre.get().getGenreId());
+                } catch (RuntimeException e) {
+                    System.out.printf("Error en la operación <%s>\n", e.getMessage());
+                }
+
+            } else {
+                System.out.printf("No existe el género con id <%d>\n", id);
             }
-
-        } else {
-            System.out.printf("No existe el género con id <%d>\n", id);
+        } catch (NumberFormatException e) {
+            System.out.println("Debes introducir un número entero.");
         }
 
     }
@@ -206,62 +218,74 @@ public class Main {
     private static void buscarListaDeReproduccionPorID() {
         // Recogemos el ID de la lista de reproducción
         System.out.println("Introduce el id de la lista de reproduccion a mostrar:");
-        int id = Integer.parseInt(SCANNER.nextLine().trim());
+        String inputRecogida = SCANNER.nextLine().trim();
 
-        // Comprobamos que existe la lista de reproduccion
         try {
-            Optional<PlayList> playlist = PLAYLIST_SERVICE.findById(id);
+            int id = Integer.parseInt(inputRecogida);
 
-            if (playlist.isPresent()) {
-                // Si existe buscamos las tracks asociadas
-                try {
+            // Comprobamos que existe la lista de reproduccion
+            try {
+                Optional<PlayList> playlist = PLAYLIST_SERVICE.findById(id);
 
-                    List<PlayListTrack> playListTracks = PLAYLISTTRACK_SERVICE.findAllByPlayListId(id);
+                if (playlist.isPresent()) {
+                    // Si existe buscamos las tracks asociadas
+                    try {
 
-                    if (playListTracks.isEmpty()) {
-                        System.out.println("No existen tracks asociadas en la lista de reproducción");
-                    } else {
-                        // Imprimimos la cabecera
-                        System.out.printf("Lista de reproducción: %s\n", playlist.get().getPlaylistName());
-                        // Imprimimos cada pista de la lista
-                        playListTracks.forEach(track -> {
-                            System.out.printf("%d - %s -> %d - %s\n", track.getPlaylistId(), track.getPlaylistName(), track.getTrackId(), track.getTrackName());
-                        });
+                        List<PlayListTrack> playListTracks = PLAYLISTTRACK_SERVICE.findAllByPlayListId(id);
+
+                        if (playListTracks.isEmpty()) {
+                            System.out.println("No existen tracks asociadas en la lista de reproducción");
+                        } else {
+                            // Imprimimos la cabecera
+                            System.out.printf("Lista de reproducción: %s\n", playlist.get().getPlaylistName());
+                            // Imprimimos cada pista de la lista
+                            playListTracks.forEach(track -> {
+                                System.out.printf("%d - %s -> %d - %s\n", track.getPlaylistId(), track.getPlaylistName(), track.getTrackId(), track.getTrackName());
+                            });
+                        }
+
+                    } catch (RuntimeException e) {
+                        System.out.printf("Error en la operación <%s>\n", e.getMessage());
                     }
 
-                } catch (RuntimeException e) {
-                    System.out.printf("Error en la operación <%s>\n", e.getMessage());
+                } else {
+                    System.out.printf("No existe una lista de reproducción con id <%d>\n", id);
                 }
 
-            } else {
-                System.out.printf("No existe una lista de reproducción con id <%d>\n", id);
+            } catch (RuntimeException e) {
+                System.out.printf("Error en la operación <%s>\n", e.getMessage());
             }
-
-        } catch (RuntimeException e) {
-            System.out.printf("Error en la operación <%s>\n", e.getMessage());
+        } catch (NumberFormatException e) {
+            System.out.println("Debes introducir un número entero.");
         }
     }
 
     private static void eliminarListaDeReproduccionPorID() {
         // Recogemos el ID de la lista de reproducción
         System.out.println("Introduce el id de la lista de reproduccion a eliminar:");
-        int id = Integer.parseInt(SCANNER.nextLine().trim());
+        String inputRecogida = SCANNER.nextLine().trim();
 
-        // Instanciamos un 'optional' para ver si existe
         try {
+            int id = Integer.parseInt(inputRecogida);
 
-            Optional<PlayList> lista = PLAYLIST_SERVICE.findById(id);
+            // Instanciamos un 'optional' para ver si existe
+            try {
 
-            // Si devuelve diferente de 'isEmpty' la eliminamos
-            if (lista.isPresent()) {
-                PLAYLIST_SERVICE.delete(id);
-                System.out.printf("Se ha eliminado la lista con id <%d>\n", id);
-            } else {
-                System.out.printf("No existe la lista de reproducción con id <%d>\n>", id);
+                Optional<PlayList> lista = PLAYLIST_SERVICE.findById(id);
+
+                // Si devuelve diferente de 'isEmpty' la eliminamos
+                if (lista.isPresent()) {
+                    PLAYLIST_SERVICE.delete(id);
+                    System.out.printf("Se ha eliminado la lista con id <%d>\n", id);
+                } else {
+                    System.out.printf("No existe la lista de reproducción con id <%d>\n>", id);
+                }
+
+            } catch (RuntimeException e) {
+                System.out.printf("Error en la operación <%s>\n", e.getMessage());
             }
-
-        } catch (RuntimeException e) {
-            System.out.printf("Error en la operación <%s>\n", e.getMessage());
+        } catch (NumberFormatException e) {
+            System.out.println("Debes introducir un numero entero.");
         }
     }
 
