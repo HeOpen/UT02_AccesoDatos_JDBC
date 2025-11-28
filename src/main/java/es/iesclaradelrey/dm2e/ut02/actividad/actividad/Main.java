@@ -103,24 +103,40 @@ public class Main {
     private static void buscarGeneroPorNombre() {
         System.out.println("Introduce el nombre del género a buscar:");
         String nombre = SCANNER.nextLine().trim();
-        List<Genre> posiblesGeneros = GENRE_SERVICE.findByName(nombre);
 
-        if (!posiblesGeneros.isEmpty()) {
-            posiblesGeneros.forEach(genre -> System.out.printf("%d - %s\n", genre.getGenreId(), genre.getName()));
+        // Comprobamos que el nombre no está vacio
+        if (!nombre.isEmpty()) {
+
+            List<Genre> posiblesGeneros = GENRE_SERVICE.findByName(nombre);
+
+            if (!posiblesGeneros.isEmpty()) {
+                posiblesGeneros.forEach(genre -> System.out.printf("%d - %s\n", genre.getGenreId(), genre.getName()));
+            } else {
+                System.out.printf("No se encuentran géneros que contengan <%s> en el nombre\n", nombre);
+            }
+
         } else {
-            System.out.printf("No se encuentran géneros que contengan <%s> en el nombre\n", nombre);
+            System.out.println("Debes introducir un nombre para buscar.");
         }
     }
 
     private static void crearNuevoGenero() {
         System.out.println("Introduce el nombre del nuevo género a guardar");
         String nombre = SCANNER.nextLine().trim();
-        try {
-            Genre nuevo = GENRE_SERVICE.save(new Genre(nombre));
-            System.out.printf("Se ha creado el género <%s> con id <%d>", nuevo.getName(), nuevo.getGenreId());
-        } catch (RuntimeException e) {
-            // Recogemos el throw new RuntimeException("Error al guardar el género", e); de GenreDataAccessImpl
-            System.out.printf("Error en la operación <%s>\n", e.getMessage());
+
+        // Comprobamos que el nombre no está vacio
+        if (!nombre.isEmpty()) {
+
+            try {
+                Genre nuevo = GENRE_SERVICE.save(new Genre(nombre));
+                System.out.printf("Se ha creado el género <%s> con id <%d>", nuevo.getName(), nuevo.getGenreId());
+            } catch (RuntimeException e) {
+                // Recogemos el throw new RuntimeException("Error al guardar el género", e); de GenreDataAccessImpl
+                System.out.printf("Error en la operación <%s>\n", e.getMessage());
+            }
+
+        } else {
+            System.out.println("Debes introducir un nombre de género para guardar.");
         }
     }
 
@@ -141,6 +157,18 @@ public class Main {
                 // Guardamos el nuevo nombre
                 System.out.println("¿Que nombre debería tener este género?:");
                 String nombreNuevo = SCANNER.nextLine().trim();
+
+                // Comprobamos que el nuevo nombre no está vacio
+                if (nombreNuevo.isEmpty()) {
+                    System.out.println("Debes introducir un nombre, no puede estar vacío");
+                    return;
+                }
+
+                // Comprobamos que no es el mismo nombre
+                if (nombreNuevo.equals(nombreAntiguo)) {
+                    System.out.println("Intentas guardar el género con el mismo nombre que ya tenía.");
+                    return;
+                }
 
                 // Ejecutamos la sentencia
                 try {
@@ -192,6 +220,12 @@ public class Main {
         // Recogemos el nombre de la nueva lista
         System.out.println("Introduce el nombre de la nueva lista de reproduccion:");
         String nombre = SCANNER.nextLine().trim();
+
+        // Comprobamos que el nuevo nombre no está vacio
+        if (nombre.isEmpty()) {
+            System.out.println("Debes introducir un nombre, no puede estar vacío");
+            return;
+        }
 
         // Recogemos los ids de los tracks
         System.out.println("Introduce los id de los tracks (separados por coma, estilo csv):");
