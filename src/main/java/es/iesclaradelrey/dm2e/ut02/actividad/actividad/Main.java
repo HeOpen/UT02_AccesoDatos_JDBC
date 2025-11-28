@@ -195,23 +195,32 @@ public class Main {
 
         // Recogemos los ids de los tracks
         System.out.println("Introduce los id de los tracks (separados por coma, estilo csv):");
-        List<Integer> listadoInts = Arrays.stream(SCANNER.nextLine().split(","))
-                .map(String::trim)
-                .map(Integer::parseInt)
-                .toList();
-
-        // Generamos los PlayListTrack
-        List<PlayListTrack> listadoTracks = new ArrayList<>();
-
-        listadoInts.forEach(i -> {
-            listadoTracks.add(PlayListTrack.builder().trackId(i).build());
-        });
-
-        // Llamamos al servicio
         try {
-            PLAYLIST_SERVICE.save(PlayList.builder().playlistName(nombre).tracks(listadoTracks).build());
-        } catch (RuntimeException e) {
-            System.out.printf("Error en la operación <%s>\n", e.getMessage());
+            List<Integer> listadoInts = Arrays.stream(SCANNER.nextLine().split(","))
+                    .map(String::trim)
+                    .map(Integer::parseInt)
+                    .toList();
+
+            if (!listadoInts.isEmpty()) {
+                System.out.println("Debes introducir al menos un track ID.");
+                return;
+            }
+
+            // Generamos los PlayListTrack
+            List<PlayListTrack> listadoTracks = new ArrayList<>();
+
+            listadoInts.forEach(i -> {
+                listadoTracks.add(PlayListTrack.builder().trackId(i).build());
+            });
+
+            // Llamamos al servicio
+            try {
+                PLAYLIST_SERVICE.save(PlayList.builder().playlistName(nombre).tracks(listadoTracks).build());
+            } catch (RuntimeException e) {
+                System.out.printf("Error en la operación <%s>\n", e.getMessage());
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Error: todos los valores deben ser números enteros separados por coma, estilo csv");
         }
     }
 
