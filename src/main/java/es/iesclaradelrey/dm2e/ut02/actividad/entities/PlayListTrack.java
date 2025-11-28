@@ -7,7 +7,6 @@ import lombok.ToString;
 
 @Builder
 @Getter
-@Setter
 @ToString
 public class PlayListTrack {
     private String playlistName;

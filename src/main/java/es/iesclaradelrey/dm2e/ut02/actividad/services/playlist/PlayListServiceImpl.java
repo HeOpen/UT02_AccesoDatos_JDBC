@@ -3,13 +3,9 @@ package es.iesclaradelrey.dm2e.ut02.actividad.services.playlist;
 import es.iesclaradelrey.dm2e.ut02.actividad.dataaccess.playlist.PlayListDataAccess;
 import es.iesclaradelrey.dm2e.ut02.actividad.entities.PlayList;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-
 import java.util.Optional;
+
 @AllArgsConstructor
-@Getter
-@Setter
 public class PlayListServiceImpl implements PlayListService {
 
     // Atributo PlayListDataAccess

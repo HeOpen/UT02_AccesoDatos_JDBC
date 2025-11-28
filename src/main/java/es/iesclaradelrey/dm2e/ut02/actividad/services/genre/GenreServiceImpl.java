@@ -3,19 +3,15 @@ package es.iesclaradelrey.dm2e.ut02.actividad.services.genre;
 import es.iesclaradelrey.dm2e.ut02.actividad.dataaccess.genre.GenreDataAccess;
 import es.iesclaradelrey.dm2e.ut02.actividad.entities.Genre;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.util.List;
 import java.util.Optional;
 
 @AllArgsConstructor
-@Getter
-@Setter
 public class GenreServiceImpl implements GenreService {
 
     // Atributo GenreDataAccess
-    private GenreDataAccess genreDataAccess;
+    private final GenreDataAccess genreDataAccess;
 
     @Override
     public List<Genre> findAll() {
