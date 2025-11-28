@@ -120,9 +120,9 @@ public class PlayListDataAccessImpl implements PlayListDataAccess {
 
             // Ejecutamos la sentencia y aprovechamos a devolver el bool (si hay columnas modificadas o no)
             // EL ORDEN IMPORTA !!!
-            int registrosModficiadosTrack = preparedStatementTracks.executeUpdate();
-            int registrosModficiadosPlaylist = preparedStatementPlaylist.executeUpdate();
-            return registrosModficiadosPlaylist + registrosModficiadosTrack > 0;
+            int registrosModificadosTrack = preparedStatementTracks.executeUpdate();
+            int registrosModificadosPlaylist = preparedStatementPlaylist.executeUpdate();
+            return registrosModificadosPlaylist + registrosModificadosTrack > 0;
 
         } catch (SQLException e) {
             throw new RuntimeException("No se ha podido realizar la conexión a la BBDD", e);
