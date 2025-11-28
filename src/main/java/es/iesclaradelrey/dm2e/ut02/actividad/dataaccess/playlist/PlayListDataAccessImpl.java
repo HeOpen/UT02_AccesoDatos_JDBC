@@ -95,7 +95,7 @@ public class PlayListDataAccessImpl implements PlayListDataAccess {
             } catch (SQLException e) {
                 throw new RuntimeException("Falló la consulta", e);
             } finally {
-                // fixme: ¿¿¿Recuperar el auto-commit para el resto de operaciones??? (No creo que sea necesario)
+                // Por lo visto si es necesario restaurar el auto-commit antes de devolver la conexión al pool
                 connection.setAutoCommit(true);
             }
 

@@ -10,9 +10,10 @@ public enum ConnectionPool {
     INSTANCE;
 
     // Info BBDD
-    private final String URL = "jdbc:postgresql://localhost:5432/chinook";
-    private final String USER = "chinook";
-    private final String PASSWORD = "chinook";
+    // No Hardcodear -> usar variables de entorno (buenas prácticas)
+    private final String URL = System.getenv().getOrDefault("DB_URL", "jdbc:postgresql://localhost:5432/chinook");
+    private final String USER = System.getenv().getOrDefault("DB_USER", "chinook");
+    private final String PASSWORD = System.getenv().getOrDefault("DB_PASSWORD", "chinook");
 
     // Recurso compartido
     private final HikariDataSource hds;
