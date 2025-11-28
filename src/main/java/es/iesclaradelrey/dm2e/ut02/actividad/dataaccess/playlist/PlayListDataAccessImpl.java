@@ -1,6 +1,7 @@
 package es.iesclaradelrey.dm2e.ut02.actividad.dataaccess.playlist;
 
 import es.iesclaradelrey.dm2e.ut02.actividad.entities.PlayList;
+import es.iesclaradelrey.dm2e.ut02.actividad.entities.PlayListTrack;
 import es.iesclaradelrey.dm2e.ut02.actividad.util.ConnectionPool;
 
 import java.sql.*;
@@ -65,27 +66,34 @@ public class PlayListDataAccessImpl implements PlayListDataAccess {
 
                 // ----- Segundo: con el ID generado, insertamos la relacion entre la playlist y sus tracks ----- //
                 // Por cada track en su lista, hacemos un insert del ID del track
-                playList.getTracks().forEach(track -> {
-                    try (PreparedStatement preparedStatementPlaylistTrack = connection.prepareStatement(SQL_SAVE_INTO_TABLE_PLAYLIST_TRACK)) {
+                try {
 
-                        // Pasamos los argumentos
-                        preparedStatementPlaylistTrack.setInt(1, playList.getPlaylistId());
-                        preparedStatementPlaylistTrack.setInt(2, track.getTrackId());
+                    for (PlayListTrack track : playList.getTracks()) {
 
-                        // Ejecutamos la sentencia
-                        preparedStatementPlaylistTrack.executeUpdate();
+                        try (PreparedStatement preparedStatementPlaylistTrack = connection.prepareStatement(SQL_SAVE_INTO_TABLE_PLAYLIST_TRACK)) {
 
-                    } catch (SQLException e) {
-                        throw new RuntimeException("Error al intentar guardar cada track ID con su playlist ID", e);
+                            // Pasamos los argumentos
+                            preparedStatementPlaylistTrack.setInt(1, playList.getPlaylistId());
+                            preparedStatementPlaylistTrack.setInt(2, track.getTrackId());
+
+                            // Ejecutamos la sentencia
+                            preparedStatementPlaylistTrack.executeUpdate();
+
+                        } catch (SQLException e) {
+                            throw new RuntimeException("Error al guardar una track de la playlist", e);
+                        }
                     }
-                });
 
-                // Finalmente confirmamos la transacción manualmente
-                connection.commit();
+                    // Finalmente confirmamos la transacción manualmente
+                    connection.commit();
+
+                } catch (SQLException e) {
+                    connection.rollback();
+                    throw new RuntimeException("Error al intentar guardar cada track ID con su playlist ID", e);
+                }
 
             } catch (SQLException e) {
-                connection.rollback();
-                throw new RuntimeException("Se ha interrumpido la confirmación de guardado", e);
+                throw new RuntimeException("Falló la consulta", e);
             } finally {
                 // fixme: ¿¿¿Recuperar el auto-commit para el resto de operaciones??? (No creo que sea necesario)
                 connection.setAutoCommit(true);
