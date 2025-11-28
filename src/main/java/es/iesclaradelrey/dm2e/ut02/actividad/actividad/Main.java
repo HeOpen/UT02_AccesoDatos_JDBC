@@ -12,6 +12,7 @@ import es.iesclaradelrey.dm2e.ut02.actividad.services.playlist.PlayListService;
 import es.iesclaradelrey.dm2e.ut02.actividad.services.playlist.PlayListServiceImpl;
 import es.iesclaradelrey.dm2e.ut02.actividad.services.playlisttrack.PlayListTrackService;
 import es.iesclaradelrey.dm2e.ut02.actividad.services.playlisttrack.PlayListTrackServiceImpl;
+import es.iesclaradelrey.dm2e.ut02.actividad.util.ConnectionPool;
 
 import java.util.*;
 import java.util.logging.Logger;
@@ -403,5 +404,11 @@ public class Main {
 
     public static void main(String[] args) {
         seleccionarNuevaOpcion();
+
+        // Fin de programa
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            System.out.println("Cerrando pool de conexiones...");
+            ConnectionPool.INSTANCE.closePool();
+        }));
     }
 }

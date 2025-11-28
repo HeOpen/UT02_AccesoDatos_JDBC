@@ -33,7 +33,9 @@ public enum ConnectionPool {
     }
 
     // Método para cerrar el pool previo a cerrar la app
-    public void closeConnection(Connection connection) throws SQLException {
-        connection.close();
+    public void closePool() {
+        if (hds != null && !hds.isClosed()) {
+            hds.close();
+        }
     }
 }
