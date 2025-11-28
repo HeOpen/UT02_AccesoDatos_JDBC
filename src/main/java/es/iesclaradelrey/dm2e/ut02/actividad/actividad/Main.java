@@ -201,7 +201,7 @@ public class Main {
                     .map(Integer::parseInt)
                     .toList();
 
-            if (!listadoInts.isEmpty()) {
+            if (listadoInts.isEmpty()) {
                 System.out.println("Debes introducir al menos un track ID.");
                 return;
             }
